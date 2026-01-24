@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Daniel Franc | Interactive Visionary Portfolio</title>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollToPlugin.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/TextPlugin.min.js"></script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&family=Syncopate:wght@700&display=swap" rel="stylesheet">
+
+    <style>
+        /* ================================================================
+           1. CSS JÁDRO & PROMĚNNÉ
+           ================================================================
+        */
+        :root {
+            --primary: #f5d300;      /* ToyFight Yellow */
+            --secondary: #2a3eb1;    /* Deep Blue */
+            --accent: #eb4d4b;       /* Action Red */
+            --bg-dark: #050505;
+            --bg-deep: #000000;
+            --text-main: #ffffff;
+            --text-muted: #888888;
+            --glass: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+            --nav-height: 100px;
+        }
+
+        /* Globální Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            outline: none;
+            -webkit-font-smoothing: antialiased;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body {
+            width: 100%;
+            min-height: 100%;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            scroll-behavior: auto; 
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-dark); }
+        ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
+
+        /* ================================================================
+           2. CUSTOM CURSOR
+           ================================================================
+        */
+        #cursor-dot {
+            position: fixed;
+            width: 8px; height: 8px;
+            background: var(--primary);
+            border-radius: 50%;
+            z-index: 10001;
+            pointer-events: none;
+            mix-blend-mode: difference;
+        }
+
+        #cursor-ring {
+            position: fixed;
+            width: 40px; height: 40px;
+            border: 1.5px solid var(--primary);
+            border-radius: 50%;
+            z-index: 10000;
+            pointer-events: none;
+            transition: transform 0.15s ease-out;
+            mix-blend-mode: difference;
+        }
+
+        @media (max-width: 1024px) {
+            #cursor-dot, #cursor-ring { display: none; }
+            body { cursor: auto; }
+        }
+
+        /* ================================================================
+           3. PRELOADER
+           ================================================================
+        */
+        #preloader {
+            position: fixed;
+            inset: 0;
+            background: #000;
+            z-index: 99999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .loader-text {
+            font-family: 'Syncopate', sans-serif;
+            font-size: 1.5rem;
+            letter-spacing: 10px;
+            color: var(--primary);
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+
+        .loader-bar {
+            width: 250px;
+            height: 2px;
+            background: rgba(255,255,255,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .loader-progress {
+            position: absolute;
+            left: 0; top: 0; height: 100%;
+            width: 0%;
+            background: var(--primary);
+            box-shadow: 0 0 15px var(--primary);
+        }
+
+        /* ================================================================
+           4. NAVIGATION (FRANC.DANIEL)
+           ================================================================
+        */
+        nav {
+            position: fixed;
+            top: 0; left: 0; width: 100%;
+            height: var(--nav-height);
+            padding: 0 60px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 5000;
+            mix-blend-mode: difference;
+        }
+
+        .logo {
+            font-family: 'Syncopate', sans-serif;
+            font-size: 1.4rem;
+            letter-spacing: 5px;
+            color: white;
+            text-decoration: none;
+            transition: var(--transition-smooth);
+        }
+
+        .logo:hover { color: var(--primary); }
+
+        .nav-links { display: flex; gap: 40px; }
+        .nav-links a {
+            text-decoration: none;
+            color: white;
+            font-weight: 700;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            opacity: 0.6;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px; left: 0; width: 0; height: 2px;
+            background: var(--primary);
+            transition: 0.3s ease;
+        }
+
+        .nav-links a:hover { opacity: 1; color: var(--primary); }
+        .nav-links a:hover::after { width: 100%; }
+
+        @media (max-width: 768px) {
+            nav { padding: 0 25px; }
+            .nav-links { display: none; }
+        }
+
+        /* ================================================================
+           5. HLAVNÍ SEKCE
+           ================================================================
+        */
+        #webgl-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        section {
+            width: 100%;
+            min-height: 100vh;
+            position: relative;
+            padding: 140px 10%;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Hero Sekce */
+        .h-large {
+            font-size: clamp(3.5rem, 14vw, 11rem);
+            font-weight: 900;
+            line-height: 0.82;
+            text-transform: uppercase;
+            margin-bottom: 25px;
+        }
+
+        .h-outline {
+            color: transparent;
+            -webkit-text-stroke: 1.5px white;
+        }
+
+        .hero-desc {
+            font-size: 1.25rem;
+            max-width: 550px;
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-top: 40px;
+            border-left: 3px solid var(--primary);
+            padding-left: 25px;
+        }
+
+        .character-box {
+            position: absolute;
+            right: 0; bottom: 0;
+            width: 50vw;
+            height: 90vh;
+            z-index: 5;
+            display: flex;
+            justify-content: flex-end;
+            align-items: flex-end;
+            pointer-events: none;
+        }
+
+        .character-box img {
+            max-height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 0 40px rgba(245, 211, 0, 0.15));
+        }
+
+        /* ================================================================
+           6. GRID SYSTÉM & KARTY
+           ================================================================
+        */
+        .grid-12 {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 25px;
+        }
+
+        .card {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            padding: 60px;
+            border-radius: 4px;
+            transition: all 0.6s var(--ease-out-expo);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .card:hover {
+            border-color: var(--primary);
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateY(-10px);
+        }
+
+        .card h3 {
+            font-size: 2.2rem;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+
+        .card p {
+            color: var(--text-muted);
+            line-height: 1.8;
+            font-size: 1.1rem;
+        }
+
+        .badge {
+            align-self: flex-start;
+            padding: 6px 15px;
+            background: var(--primary);
+            color: black;
+            font-weight: 900;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            border-radius: 2px;
+            margin-bottom: 25px;
+            letter-spacing: 1px;
+        }
+
+        /* Column spans */
+        .col-12 { grid-column: span 12; }
+        .col-8 { grid-column: span 8; }
+        .col-6 { grid-column: span 6; }
+        .col-4 { grid-column: span 4; }
+
+        @media (max-width: 1024px) {
+            .col-8, .col-6, .col-4 { grid-column: span 12; }
+            section { padding: 100px 5%; }
+            .card { padding: 40px 25px; }
+            .character-box { opacity: 0.3; width: 80vw; }
+        }
+
+        /* ================================================================
+           7. SPECIAL: 53 ŠKOL (BIG DATA)
+           ================================================================
+        */
+        .highlight-stat {
+            background: var(--primary);
+            color: #000;
+            padding: 100px;
+            display: flex;
+            align-items: center;
+            gap: 60px;
+            margin: 50px 0;
+        }
+
+        .stat-giant {
+            font-size: 12rem;
+            font-weight: 900;
+            line-height: 0.8;
+        }
+
+        .stat-info h4 {
+            font-size: 3rem;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .highlight-stat { flex-direction: column; text-align: center; padding: 60px 30px; }
+            .stat-giant { font-size: 7rem; }
+        }
+
+        /* ================================================================
+           8. STARTUP & SERVICE ENGINE
+           ================================================================
+        */
+        .service-grid {
+            margin-top: 40px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .service-item {
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding: 25px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: 0.4s;
+        }
+
+        .service-item:hover {
+            padding-left: 20px;
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .service-item span { font-weight: 700; text-transform: uppercase; }
+
+        /* ================================================================
+           9. TIMELINE & ACHIEVEMENTS
+           ================================================================
+        */
+        .timeline-wrap {
+            margin-top: 60px;
+            border-left: 2px solid var(--glass-border);
+            padding-left: 40px;
+        }
+
+        .timeline-node {
+            position: relative;
+            padding-bottom: 60px;
+        }
+
+        .timeline-node::before {
+            content: '';
+            position: absolute;
+            left: -51px; top: 0;
+            width: 20px; height: 20px;
+            background: var(--primary);
+            border-radius: 50%;
+            box-shadow: 0 0 15px var(--primary);
+        }
+
+        .timeline-node h4 { font-size: 1.5rem; text-transform: uppercase; margin-bottom: 10px; }
+        .timeline-node .year { color: var(--primary); font-weight: 900; margin-bottom: 5px; display: block; }
+
+        /* ================================================================
+           10. H2 GRAND PRIX SPECS
+           ================================================================
+        */
+        .h2-specs {
+            background: #111;
+            padding: 40px;
+            border-radius: 4px;
+            margin-top: 30px;
+        }
+
+        .spec-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 0;
+            border-bottom: 1px solid #222;
+        }
+
+        .spec-label { color: var(--text-muted); font-size: 0.9rem; text-transform: uppercase; }
+        .spec-val { font-weight: 900; color: var(--primary); }
+
+        /* ================================================================
+           11. SPLIT DESIGN (SPORTS)
+           ================================================================
+        */
+        .split-wrap {
+            display: flex;
+            min-height: 100vh;
+            width: 100%;
+        }
+
+        .half {
+            flex: 1;
+            padding: 120px 8%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .half-blue { background: var(--secondary); color: white; }
+        .half-yellow { background: var(--primary); color: black; }
+
+        @media (max-width: 1024px) {
+            .split-wrap { flex-direction: column; }
+        }
+
+        /* ================================================================
+           12. FOOTER
+           ================================================================
+        */
+        footer {
+            padding: 120px 10% 60px;
+            background: #000;
+            text-align: center;
+        }
+
+        .footer-cta {
+            font-size: clamp(3rem, 10vw, 8rem);
+            font-weight: 900;
+            text-transform: uppercase;
+            color: var(--primary);
+            text-decoration: none;
+            display: block;
+            margin-bottom: 60px;
+            transition: transform 0.4s var(--ease-out-expo);
+        }
+
+        .footer-cta:hover { transform: scale(1.05); letter-spacing: 2px; }
+
+        .footer-bottom {
+            display: flex;
+            justify-content: space-between;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 50px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+
+        /* UTILS */
+        .reveal { opacity: 0; transform: translateY(50px); }
+        .m-t-50 { margin-top: 50px; }
+    </style>
+</head>
+<body>
+
+    <div id="cursor-dot"></div>
+    <div id="cursor-ring"></div>
+
+    <div id="preloader">
+        <div class="loader-text">FRANC.DANIEL</div>
+        <div class="loader-bar">
+            <div class="loader-progress" id="p-bar"></div>
+        </div>
+    </div>
+
+    <nav>
+        <a href="#" class="logo">FRANC.DANIEL</a>
+        <div class="nav-links">
+            <a href="#hero">Start</a>
+            <a href="#projects">Mise</a>
+            <a href="#about">Bio</a>
+            <a href="#achievements">Hall</a>
+            <a href="#contact">Kontakt</a>
+        </div>
+    </nav>
+
+    <canvas id="webgl-bg"></canvas>
+
+    <main>
+
+        <section id="hero">
+            <div class="container">
+                <div class="hero-title-wrap">
+                    <h1 class="h-large">VISIONARY<br><span class="h-outline">LEAD</span></h1>
+                    <h1 class="h-large">& PRODUCER</h1>
+                    <p class="hero-desc">
+                        Daniel Franc. Student SSPŠ. Výkonný lídr se smyslem pro detail. 
+                        Od strategického řízení projektů až po profesionální mediální produkci pro CZ.NIC.
+                    </p>
+                </div>
+            </div>
+            <div class="character-box" id="p-char">
+                <img src="daniel-cutout.png" alt="Daniel Franc" id="char-img">
+            </div>
+        </section>
+
+        <section id="about">
+            <div class="container">
+                <div class="grid-12">
+                    <div class="card col-8 reveal">
+                        <div class="badge">Filozofie</div>
+                        <h3>Architektura úspěchu</h3>
+                        <p>
+                            Vyrůstám v prostředí, kde se kód potkává s designem (otec programátor, matka architektka). 
+                            Tento základ mi umožnil vyvinout unikátní schopnost organizovat komplexní projekty. 
+                            Baví mě propojovat lidi a technologie. Nečekám na příležitost, já ji vytvářím – 
+                            od 3D grafiky v 6. třídě po dnešní vedení mediálních štábů.
+                        </p>
+                    </div>
+                    <div class="card col-4 reveal" style="background: var(--primary); color: #000;">
+                        <h3>Leadership</h3>
+                        <p>Nejsem jen student IT. Jsem člověk, který převzal zodpovědnost za kampaň pro 53 škol a řídí chod mediálních výstupů pro významné instituce.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="reveal">
+            <div class="container">
+                <div class="highlight-stat">
+                    <div class="stat-giant" id="s-count">53</div>
+                    <div class="stat-info">
+                        <h4>Základních škol</h4>
+                        <p>Úspěšně zrealizovaný projekt "Propagace na základkách". Sám jsem kontaktoval vedení škol, vyjednal spolupráci a vyslal delegace studentů prezentovat SSPŠ.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="projects">
+            <div class="container">
+                <div class="grid-12">
+                    <div class="card col-6 reveal">
+                        <div class="badge">Media Lead</div>
+                        <h3>CZ.NIC: No Net Drama</h3>
+                        <p>
+                            Jako Vedoucí produkčního týmu spravuji technickou a kreativní kvalitu obsahu pro Instagram. 
+                            Koordinuji tým střihačů, zajišťuji hladký průběh natáčení a dohlížím na to, aby každé video splňovalo nejvyšší standardy v DaVinci Resolve.
+                        </p>
+                    </div>
+                    <div class="card col-6 reveal">
+                        <div class="badge">Founder</div>
+                        <h3>Vlastní Webový Startup</h3>
+                        <p>
+                            Se skupinou přátel provozujeme webové studio. Z naší kanceláře řešíme kompletní digitální přítomnost klientů – od UI/UX designu po finální kód a strategii.
+                        </p>
+                        <div class="service-grid">
+                            <div class="service-item"><span>Web Dev</span> <span>HTML/CSS/JS</span></div>
+                            <div class="service-item"><span>UI/UX</span> <span>Figma/Adobe</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="container">
+                <div class="grid-12">
+                    <div class="col-6 reveal">
+                        <h2 class="h-large" style="font-size: 3.5rem;">H2 Grand<br>Prix</h2>
+                        <p class="hero-desc">Stavíme budoucnost na vodíku. Jako tým pracujeme na vývoji a závodech vodíkového RC auta v měřítku 1:10.</p>
+                    </div>
+                    <div class="col-6 reveal">
+                        <div class="h2-specs">
+                            <div class="spec-row"><span class="spec-label">Typ Energie</span> <span class="spec-val">Vodíkový článek</span></div>
+                            <div class="spec-row"><span class="spec-label">Workflow</span> <span class="spec-val">Engineering & Racing</span></div>
+                            <div class="spec-row"><span class="spec-label">Stav projektu</span> <span class="spec-val">Aktivní vývoj</span></div>
+                        </div>
+                        
+
+[Image of hydrogen fuel cell]
+
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="teaching" style="background: #080808;">
+            <div class="container">
+                <div class="grid-12">
+                    <div class="card col-12 reveal" style="background: var(--secondary);">
+                        <div class="badge" style="background: white;">IT Edukátor</div>
+                        <h3>Předávám znalosti dál</h3>
+                        <p>
+                            V DDM Praha 7 působím jako lektor kroužků Minecraft Education a asistent u kurzu IT Profík. 
+                            Na táborech v roli praktikanta připravuji herní programy a zodpovídám za bezpečnost a rozvoj dětí. 
+                            Baví mě ukazovat ostatním, že technologie jsou nástroj pro tvorbu, ne jen pro konzum.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="achievements">
+            <div class="container">
+                <div class="grid-12">
+                    <div class="col-4 reveal">
+                        <h2 class="h-large" style="font-size: 3rem;">Soutěže<br>& PR</h2>
+                        <p class="hero-desc">Pravidelná reprezentace školy na akcích jako <strong>Schola Pragensis</strong> nebo Techfair za UŠI.</p>
+                    </div>
+                    <div class="col-8">
+                        <div class="timeline-wrap">
+                            <div class="timeline-node reveal">
+                                <span class="year">2025</span>
+                                <h4>Rozhodčí FAČR</h4>
+                                <p>Licencované pískání zápasů, administrativní správa utkání a okamžité rozhodování v krizových situacích.</p>
+                            </div>
+                            <div class="timeline-node reveal">
+                                <span class="year">2024</span>
+                                <h4>PR Ambasador SSPŠ</h4>
+                                <p>Reprezentace školy na Nové radnici a účast na kulatých stolech o rozvoji Smíchova.</p>
+                            </div>
+                            <div class="timeline-node reveal">
+                                <span class="year">2023</span>
+                                <h4>Pythagoriáda & Recitace</h4>
+                                <p>Postup do pražských kol v matematické logice i uměleckém přednesu (2x postup).</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="split-wrap" id="sports">
+            <div class="half half-blue reveal">
+                <div class="badge" style="background: white; color: var(--secondary);">Disciplina</div>
+                <h2 class="h-large" style="font-size: 4rem;">Sportovní<br>Dril</h2>
+                <p>
+                    Obránce v základu SK Ďáblice. Fotbal mě naučil, že úspěch je výsledkem dlouhodobého tréninku a disciplíny. 
+                    Tento přístup přenáším do každého projektu, na kterém pracuji.
+                </p>
+            </div>
+            <div class="half half-yellow reveal">
+                <h3 style="font-size: 2rem; margin-bottom: 25px;">Osobní Výzvy</h3>
+                <p>Reprezentace školy: Basketbal, Florbal, Atletika, Šplh.</p>
+                <div class="m-t-50">
+                    <p><strong>Hory:</strong> Přechod Nízkých Tater & Via Ferrata (Česko, zahraničí).</p>
+                    <p><strong>Dovednosti:</strong> Rozhodčí FAČR // Vyšívání & Šití // Vaření.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact">
+            <div class="container" style="text-align: center;">
+                <p class="hero-desc" style="margin: 0 auto 30px;">Máš vizi, kterou potřebuješ zrealizovat?</p>
+                <a href="mailto:daniel.franc@email.cz" class="footer-cta">Napiš mi.</a>
+                <div class="footer-bottom">
+                    <div>© 2026 Daniel Franc // Visionary Producer</div>
+                    <div style="text-align: right;">
+                        SSPŠ & GYMNÁZIUM // PRAHA // CZE<br>
+                        Employee at JdemeBruslit.cz
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        /* A. THREE.JS BACKGROUND SCENE 
+           Vytváříme interaktivní svět s částicemi a 3D tělesem.
+        */
+        class WebGLWorld {
+            constructor() {
+                this.container = document.querySelector('#webgl-bg');
+                this.scene = new THREE.Scene();
+                this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+                this.renderer = new THREE.WebGLRenderer({
+                    canvas: this.container,
+                    antialias: true,
+                    alpha: true
+                });
+                this.init();
+            }
+
+            init() {
+                this.renderer.setSize(window.innerWidth, window.innerHeight);
+                this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+                this.camera.position.z = 5;
+
+                this.addLights();
+                this.addParticles();
+                this.addMainMesh();
+                this.addEventListeners();
+                this.render();
+            }
+
+            addLights() {
+                const ambient = new THREE.AmbientLight(0xffffff, 0.4);
+                this.scene.add(ambient);
+                
+                const point = new THREE.PointLight(0xf5d300, 1.2);
+                point.position.set(5, 5, 5);
+                this.scene.add(point);
+            }
+
+            addParticles() {
+                const geo = new THREE.BufferGeometry();
+                const count = 3000;
+                const pos = new Float32Array(count * 3);
+                for(let i=0; i < count * 3; i++) {
+                    pos[i] = (Math.random() - 0.5) * 20;
+                }
+                geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+                const mat = new THREE.PointsMaterial({ size: 0.005, color: 0xffffff, transparent: true, opacity: 0.3 });
+                this.stars = new THREE.Points(geo, mat);
+                this.scene.add(this.stars);
+            }
+
+            addMainMesh() {
+                const geo = new THREE.IcosahedronGeometry(2, 1);
+                const mat = new THREE.MeshPhongMaterial({
+                    color: 0xf5d300,
+                    wireframe: true,
+                    transparent: true,
+                    opacity: 0.08
+                });
+                this.mesh = new THREE.Mesh(geo, mat);
+                this.scene.add(this.mesh);
+            }
+
+            addEventListeners() {
+                window.addEventListener('resize', () => {
+                    this.camera.aspect = window.innerWidth / window.innerHeight;
+                    this.camera.updateProjectionMatrix();
+                    this.renderer.setSize(window.innerWidth, window.innerHeight);
+                });
+
+                this.mouseX = 0;
+                this.mouseY = 0;
+                window.addEventListener('mousemove', (e) => {
+                    this.mouseX = (e.clientX / window.innerWidth) - 0.5;
+                    this.mouseY = (e.clientY / window.innerHeight) - 0.5;
+                });
+            }
+
+            render() {
+                requestAnimationFrame(() => this.render());
+                
+                this.mesh.rotation.y += 0.003;
+                this.mesh.rotation.z += 0.001;
+                
+                this.stars.rotation.y += 0.0005;
+                this.stars.rotation.x += this.mouseY * 0.05;
+                this.stars.rotation.y += this.mouseX * 0.05;
+
+                this.renderer.render(this.scene, this.camera);
+            }
+        }
+
+        /* B. UX & ANIMATION ENGINE (GSAP)
+           Řídí kurzor, preloader a veškeré plynulé animace.
+        */
+        class AnimationEngine {
+            constructor() {
+                this.dot = document.querySelector('#cursor-dot');
+                this.ring = document.querySelector('#cursor-ring');
+                
+                this.initPreloader();
+                this.initCursor();
+                this.initScrollAnims();
+                this.initParallax();
+            }
+
+            initPreloader() {
+                const bar = document.querySelector('#p-bar');
+                gsap.to(bar, {
+                    width: "100%",
+                    duration: 2.5,
+                    ease: "power4.inOut",
+                    onComplete: () => {
+                        gsap.to("#preloader", {
+                            yPercent: -100,
+                            duration: 1.2,
+                            ease: "expo.inOut"
+                        });
+                        this.launchHero();
+                    }
+                });
+            }
+
+            initCursor() {
+                window.addEventListener('mousemove', (e) => {
+                    gsap.to(this.dot, { x: e.clientX, y: e.clientY, duration: 0 });
+                    gsap.to(this.ring, { x: e.clientX - 20, y: e.clientY - 20, duration: 0.25 });
+                });
+
+                document.querySelectorAll('a, .card, .service-item').forEach(el => {
+                    el.addEventListener('mouseenter', () => {
+                        gsap.to(this.ring, { scale: 1.6, background: "rgba(245, 211, 0, 0.1)", duration: 0.3 });
+                    });
+                    el.addEventListener('mouseleave', () => {
+                        gsap.to(this.ring, { scale: 1, background: "transparent", duration: 0.3 });
+                    });
+                });
+            }
+
+            launchHero() {
+                const tl = gsap.timeline();
+                tl.from(".h-large", {
+                    y: 150,
+                    skewY: 10,
+                    opacity: 0,
+                    duration: 1.5,
+                    stagger: 0.15,
+                    ease: "power4.out"
+                })
+                .from(".hero-desc", { opacity: 0, x: -30, duration: 1 }, "-=1")
+                .from("#char-img", { scale: 1.3, opacity: 0, duration: 2, ease: "power2.out" }, "-=1.5");
+            }
+
+            initScrollAnims() {
+                gsap.registerPlugin(ScrollTrigger);
+
+                gsap.utils.toArray('.reveal').forEach(el => {
+                    gsap.to(el, {
+                        scrollTrigger: {
+                            trigger: el,
+                            start: "top 85%",
+                            toggleActions: "play none none reverse"
+                        },
+                        opacity: 1,
+                        y: 0,
+                        duration: 1,
+                        ease: "power3.out"
+                    });
+                });
+
+                // Odpočítávání škol
+                gsap.from("#s-count", {
+                    scrollTrigger: {
+                        trigger: ".highlight-stat",
+                        start: "top 80%"
+                    },
+                    innerText: 0,
+                    duration: 3,
+                    snap: { innerText: 1 },
+                    ease: "power4.out"
+                });
+            }
+
+            initParallax() {
+                window.addEventListener('mousemove', (e) => {
+                    const x = (e.clientX - window.innerWidth / 2) * 0.015;
+                    const y = (e.clientY - window.innerHeight / 2) * 0.015;
+                    gsap.to("#char-img", {
+                        x: x,
+                        y: y,
+                        rotationY: x * 0.5,
+                        duration: 1.5,
+                        ease: "power2.out"
+                    });
+                });
+            }
+        }
+
+        /* C. BOOTSTRAP */
+        window.addEventListener('DOMContentLoaded', () => {
+            new WebGLWorld();
+            new AnimationEngine();
+            console.log("DANIEL FRANC // VISIONARY PRODUCER // SYSTEM READY");
+        });
+    </script>
+</body>
+</html>
