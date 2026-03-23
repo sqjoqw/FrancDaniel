@@ -70,13 +70,13 @@
             text-transform: uppercase;
             letter-spacing: 0.1em;
             color: var(--text-muted);
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
             display: block;
         }
 
         /* === HERO SECTION === */
         .hero {
-            height: 350vh;
+            height: 250vh; /* Zkráceno pro rychlejší náběh */
             position: relative;
             z-index: 2;
         }
@@ -119,24 +119,39 @@
             box-shadow: 0 -20px 50px rgba(0,0,0,0.9); 
         }
 
-        /* === PORTFOLIO GRID === */
-        .gallery-section { margin-bottom: 10vh; }
-        .grid { display: grid; gap: 20px; }
+        /* === PORTFOLIO MASONRY GRID === */
+        .gallery-section { margin-bottom: 15vh; }
+        
+        /* Masonry setup pomocí CSS sloupců pro zachování poměru stran fotek */
+        .masonry-grid {
+            column-count: 2;
+            column-gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .masonry-grid.wide-env {
+            column-count: 2; /* Pro krajiny můžeš nechat 2, nebo změnit na 1 pokud jsou hodně široké */
+        }
+
         .img-wrapper {
             position: relative;
             overflow: hidden;
             background: #111;
             cursor: pointer;
+            display: inline-block;
+            width: 100%;
+            margin-bottom: 20px;
+            break-inside: avoid; /* Zabrání rozlomení fotky mezi sloupci */
         }
         .img-wrapper img {
-            width: 100%; height: 100%; object-fit: cover;
-            /* Extra smooth hover transition */
-            transition: transform 1.2s cubic-bezier(0.19, 1, 0.22, 1), filter 1.2s ease;
-            filter: grayscale(15%);
+            width: 100%; 
+            height: auto; /* Důležité: Respektuje původní poměr stran */
             display: block;
+            transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), filter 0.8s ease;
+            filter: grayscale(10%);
         }
         .img-wrapper:hover img {
-            transform: scale(1.04);
+            transform: scale(1.03);
             filter: grayscale(0%);
         }
         .img-overlay {
@@ -145,19 +160,12 @@
             padding: 20px;
             background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
             opacity: 0;
-            transition: opacity 0.6s ease;
+            transition: opacity 0.4s ease;
             font-family: var(--font-mono);
             font-size: 0.8rem;
+            pointer-events: none;
         }
         .img-wrapper:hover .img-overlay { opacity: 1; }
-
-        .grid-portraits { grid-template-columns: repeat(2, 1fr); max-width: 1000px; margin: 0 auto; }
-        .grid-portraits .img-wrapper { aspect-ratio: 4/5; }
-        
-        .grid-landscape { grid-template-columns: repeat(3, 1fr); }
-        .grid-landscape .img-wrapper { aspect-ratio: 16/9; }
-        .grid-event { grid-template-columns: repeat(2, 1fr); }
-        .grid-event .img-wrapper { aspect-ratio: 21/9; }
 
         /* === ABOUT & REALIZACE === */
         .flex-split { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start; }
@@ -240,15 +248,13 @@
 
         /* RESPONSIVE */
         @media (max-width: 1024px) {
-            .grid-landscape { grid-template-columns: repeat(1, 1fr); }
-            .grid-event { grid-template-columns: 1fr; }
             .flex-split, .pricing-block { flex-direction: column; grid-template-columns: 1fr; gap: 40px; }
             .config-dashboard { grid-template-columns: repeat(2, 1fr); }
             .hero-title { font-size: 8vw; }
             .hero-subtitle { font-size: 3vw; }
         }
-        @media (max-width: 600px) {
-            .grid-portraits { grid-template-columns: 1fr; }
+        @media (max-width: 768px) {
+            .masonry-grid { column-count: 1; }
             .config-dashboard { grid-template-columns: 1fr; }
             .ui-panel { border-left: none; border-top: 1px solid var(--border-color); padding-left: 0; padding-top: 20px; }
         }
@@ -279,28 +285,28 @@
                 
                 <div class="gallery-section">
                     <span class="mono-label">DIR: /portfolio/portraits</span>
-                    <div class="grid grid-portraits">
-                        <div class="img-wrapper"><img src="images/portraits/11.jpg" alt="Portrét 1"><div class="img-overlay">#11_PORTRAIT_RAW</div></div>
-                        <div class="img-wrapper"><img src="images/portraits/12.jpg" alt="Portrét 2"><div class="img-overlay">#12_PORTRAIT_RAW</div></div>
-                        <div class="img-wrapper"><img src="images/portraits/13.jpg" alt="Portrét 3"><div class="img-overlay">#13_PORTRAIT_RAW</div></div>
-                        <div class="img-wrapper"><img src="images/portraits/14.jpg" alt="Portrét 4"><div class="img-overlay">#14_PORTRAIT_RAW</div></div>
+                    <div class="masonry-grid">
+                        <div class="img-wrapper"><img src="images/portraits/11.jpg" alt="Portrét 1" loading="lazy"><div class="img-overlay">#11_PORTRAIT_RAW</div></div>
+                        <div class="img-wrapper"><img src="images/portraits/12.jpg" alt="Portrét 2" loading="lazy"><div class="img-overlay">#12_PORTRAIT_RAW</div></div>
+                        <div class="img-wrapper"><img src="images/portraits/13.jpg" alt="Portrét 3" loading="lazy"><div class="img-overlay">#13_PORTRAIT_RAW</div></div>
+                        <div class="img-wrapper"><img src="images/portraits/14.jpg" alt="Portrét 4" loading="lazy"><div class="img-overlay">#14_PORTRAIT_RAW</div></div>
                     </div>
                 </div>
 
                 <div class="gallery-section">
                     <span class="mono-label">DIR: /portfolio/environment</span>
-                    <div class="grid grid-landscape">
-                        <div class="img-wrapper"><img src="images/environment/21.jpg" alt="Město 1"><div class="img-overlay">ENV_21_COMPOSITION</div></div>
-                        <div class="img-wrapper"><img src="images/environment/22.jpg" alt="Krajina 1"><div class="img-overlay">ENV_22_WIDE</div></div>
-                        <div class="img-wrapper"><img src="images/environment/23.jpg" alt="Krajina 2"><div class="img-overlay">ENV_23_STUDY</div></div>
+                    <div class="masonry-grid wide-env">
+                        <div class="img-wrapper"><img src="images/environment/21.jpg" alt="Environment 1" loading="lazy"><div class="img-overlay">ENV_21_COMPOSITION</div></div>
+                        <div class="img-wrapper"><img src="images/environment/22.jpg" alt="Environment 2" loading="lazy"><div class="img-overlay">ENV_22_WIDE</div></div>
+                        <div class="img-wrapper"><img src="images/environment/23.jpg" alt="Environment 3" loading="lazy"><div class="img-overlay">ENV_23_STUDY</div></div>
                     </div>
                 </div>
 
                 <div class="gallery-section">
                     <span class="mono-label">DIR: /portfolio/event_coverage</span>
-                    <div class="grid grid-event">
-                        <div class="img-wrapper"><img src="images/events/3.jpg" alt="Event Wide"><div class="img-overlay">EVNT_3_ATMOSPHERE</div></div>
-                        <div class="img-wrapper"><img src="images/events/31.jpg" alt="Event Detail"><div class="img-overlay">EVNT_31_DETAIL</div></div>
+                    <div class="masonry-grid">
+                        <div class="img-wrapper"><img src="images/events/3.jpg" alt="Event Wide" loading="lazy"><div class="img-overlay">EVNT_3_ATMOSPHERE</div></div>
+                        <div class="img-wrapper"><img src="images/events/31.jpg" alt="Event Detail" loading="lazy"><div class="img-overlay">EVNT_31_DETAIL</div></div>
                     </div>
                 </div>
 
@@ -421,25 +427,21 @@
             transmission: 1.0, thickness: 0.5, ior: 1.5,
         });
 
-        // Tělo
         const bodyGeo = new THREE.BoxGeometry(5.0, 3.2, 1.2);
         const camBody = new THREE.Mesh(bodyGeo, bodyMat);
         camBody.position.z = -1.8;
         cameraGroup.add(camBody);
 
-        // Grip
         const gripGeo = new THREE.BoxGeometry(1.2, 3.2, 1.8);
         const grip = new THREE.Mesh(gripGeo, bodyMat);
         grip.position.set(-1.9, 0, -1.5); 
         cameraGroup.add(grip);
 
-        // Hledáček
         const evfGeo = new THREE.BoxGeometry(1.8, 0.8, 1.4);
         const evf = new THREE.Mesh(evfGeo, bodyMat);
         evf.position.set(0, 1.8, -1.8);
         cameraGroup.add(evf);
 
-        // Kolečka
         const dialGeo = new THREE.CylinderGeometry(0.4, 0.4, 0.2, 32);
         const dial1 = new THREE.Mesh(dialGeo, plasticMat);
         dial1.position.set(1.5, 1.7, -1.8);
@@ -448,21 +450,18 @@
         dial2.position.set(2.1, 1.7, -1.8);
         cameraGroup.add(dial2);
 
-        // Bajonet
         const mountGeo = new THREE.CylinderGeometry(1.4, 1.4, 0.1, 64);
         mountGeo.rotateX(Math.PI / 2);
         const mount = new THREE.Mesh(mountGeo, mountMat);
         mount.position.z = -1.15;
         cameraGroup.add(mount);
 
-        // Objektiv
         const barrelGeo = new THREE.CylinderGeometry(1.55, 1.4, 3.5, 64);
         barrelGeo.rotateX(Math.PI / 2);
         const barrel = new THREE.Mesh(barrelGeo, plasticMat);
         barrel.position.z = 0.6;
         cameraGroup.add(barrel);
 
-        // Kroužky ostření
         for(let i = 0; i < 2; i++) {
             const ringGeo = new THREE.CylinderGeometry(1.58, 1.58, 0.6, 64);
             ringGeo.rotateX(Math.PI / 2);
@@ -471,24 +470,20 @@
             cameraGroup.add(ring);
         }
 
-        // Přední čočka
         const glassGeo = new THREE.SphereGeometry(1.2, 32, 32, 0, Math.PI * 2, 0, Math.PI / 4);
         const glass = new THREE.Mesh(glassGeo, glassMat);
         glass.position.z = 1.9;
         glass.rotation.x = Math.PI / 2;
         cameraGroup.add(glass);
 
-        // Výchozí rotace
         cameraGroup.rotation.set(0.3, -0.6, 0.1);
 
-        // Osvětlení
         scene.add(new THREE.AmbientLight(0xffffff, 0.3));
         const spotLight = new THREE.SpotLight(0xffffff, 4);
         spotLight.position.set(10, 15, 10);
         spotLight.angle = Math.PI / 4;
         scene.add(spotLight);
 
-        // Render Loop
         const clock = new THREE.Clock();
         function animate() {
             requestAnimationFrame(animate);
@@ -500,66 +495,62 @@
         animate();
 
         // ==========================================
-        // SMOOTH GSAP SCROLL ANIMATIONS
+        // SVIŽNĚJŠÍ GSAP SCROLL ANIMATIONS
         // ==========================================
         gsap.registerPlugin(ScrollTrigger);
 
-        // 1. Plynulejší zoom kamery (scrub: 1.5 pro setrvačnost, power3.inOut pro hladší nájezd)
+        // Změněn scrub na 0.8 pro mnohem rychlejší odezvu
         const zoomTl = gsap.timeline({
             scrollTrigger: {
                 trigger: ".hero",
                 start: "top top",
-                end: "60% top",
-                scrub: 1.5, // Zvýšeno pro větší hladkost/setrvačnost
+                end: "70% top",
+                scrub: 0.8, 
             }
         });
 
-        zoomTl.to(cameraGroup.rotation, { x: 0, y: 0, z: 0, ease: "power3.inOut" }, 0);
-        zoomTl.to(cameraGroup.position, { z: 14.5, ease: "power3.in" }, 0); // Tahle zůstává 'in', aby to narazilo do skla
-        zoomTl.to(".hero-ui", { opacity: 0, scale: 0.9, ease: "power2.inOut" }, 0);
+        zoomTl.to(cameraGroup.rotation, { x: 0, y: 0, z: 0, ease: "power2.out" }, 0);
+        zoomTl.to(cameraGroup.position, { z: 14.5, ease: "power3.in" }, 0); 
+        zoomTl.to(".hero-ui", { opacity: 0, scale: 0.95, ease: "power1.out" }, 0);
 
-        // 2. Odhalení obsahu
         gsap.to("#main-content", {
             scrollTrigger: {
                 trigger: ".hero",
                 start: "65% top",
-                end: "80% top",
-                scrub: 1.5,
+                end: "85% top",
+                scrub: 0.8,
             },
             opacity: 1,
             ease: "none"
         });
 
-        // 3. Kaskádovité (staggered) plynulé objevování fotek
-        const grids = gsap.utils.toArray('.grid');
-        grids.forEach(grid => {
+        const masonryGrids = gsap.utils.toArray('.masonry-grid');
+        masonryGrids.forEach(grid => {
             const images = grid.querySelectorAll('.img-wrapper');
             gsap.from(images, {
                 scrollTrigger: {
                     trigger: grid,
                     start: "top 85%",
                 },
-                y: 60, // Vyšší počáteční pozice
+                y: 30,
                 opacity: 0,
-                duration: 1.2, // Delší trvání fade-inu
-                ease: "power3.out",
-                stagger: 0.15 // Postupné načítání (jeden po druhém)
+                duration: 0.8,
+                ease: "power2.out",
+                stagger: 0.1 
             });
         });
 
-        // 4. Data panely
         gsap.from(".config-dashboard, .pricing-block", {
             scrollTrigger: {
                 trigger: "#config",
                 start: "top 85%"
             },
-            y: 40,
+            y: 30,
             opacity: 0,
-            duration: 1.2,
-            ease: "power3.out"
+            duration: 0.8,
+            ease: "power2.out"
         });
 
-        // Resizing
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
