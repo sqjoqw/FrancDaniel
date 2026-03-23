@@ -36,7 +36,6 @@
             color: var(--text-main);
             font-family: var(--font-sans);
             overflow-x: hidden;
-            /* Odstraněno overscroll-behavior pro opravu scrollování */
         }
         ::selection { background: var(--text-main); color: var(--bg-color); }
         ul { list-style: none; }
@@ -77,7 +76,7 @@
 
         /* === HERO SECTION === */
         .hero {
-            height: 300vh; /* Vytváří prostor pro scroll animaci */
+            height: 350vh; /* Delší scroll pro dokončení animace PŘED obsahem */
             position: relative;
             z-index: 2;
         }
@@ -110,13 +109,13 @@
         }
         .scroll-line { width: 1px; height: 40px; background: currentColor; }
 
-        /* === MAIN CONTENT (Revealed after lens zoom) === */
+        /* === MAIN CONTENT === */
         #main-content {
             background-color: var(--bg-content);
             position: relative;
             z-index: 20;
             padding-top: 5vh;
-            /* Zajišťuje, že přechod z černé čočky do obsahu je plynulý */
+            opacity: 0; /* Bude odhaleno přes GSAP až po zoomu */
             box-shadow: 0 -20px 50px rgba(0,0,0,0.9); 
         }
 
@@ -151,8 +150,10 @@
         }
         .img-wrapper:hover .img-overlay { opacity: 1; }
 
-        .grid-portraits { grid-template-columns: repeat(3, 1fr); }
+        /* Mřížka pro 4 portréty (2x2) */
+        .grid-portraits { grid-template-columns: repeat(2, 1fr); max-width: 1000px; margin: 0 auto; }
         .grid-portraits .img-wrapper { aspect-ratio: 4/5; }
+        
         .grid-landscape { grid-template-columns: repeat(3, 1fr); }
         .grid-landscape .img-wrapper { aspect-ratio: 16/9; }
         .grid-event { grid-template-columns: repeat(2, 1fr); }
@@ -252,7 +253,6 @@
 
         /* RESPONSIVE */
         @media (max-width: 1024px) {
-            .grid-portraits { grid-template-columns: repeat(2, 1fr); }
             .grid-landscape { grid-template-columns: repeat(1, 1fr); }
             .grid-event { grid-template-columns: 1fr; }
             .flex-split, .pricing-block { flex-direction: column; grid-template-columns: 1fr; gap: 40px; }
@@ -297,8 +297,6 @@
                         <div class="img-wrapper"><img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Portrét 2"><div class="img-overlay">#02_PORTRAIT_RAW</div></div>
                         <div class="img-wrapper"><img src="https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Portrét 3"><div class="img-overlay">#03_PORTRAIT_RAW</div></div>
                         <div class="img-wrapper"><img src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Portrét 4"><div class="img-overlay">#04_PORTRAIT_RAW</div></div>
-                        <div class="img-wrapper"><img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Portrét 5"><div class="img-overlay">#05_PORTRAIT_RAW</div></div>
-                        <div class="img-wrapper"><img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Portrét 6"><div class="img-overlay">#06_PORTRAIT_RAW</div></div>
                     </div>
                 </div>
 
@@ -392,7 +390,6 @@
                         <p><strong>Vše je o dohodě.</strong> Výše uvedená částka je základní orientační sazba. Ke každému projektu přistupuji individuálně a finální rozpočet (úkolová mzda / projektová cena) nastavujeme společně podle reálných potřeb, rozsahu výstupu a náročnosti postprodukce.</p>
                     </div>
                 </div>
-
             </section>
 
             <footer>
@@ -424,65 +421,85 @@
         container.appendChild(renderer.domElement);
 
         // ==========================================
-        // BUILD PROCEDURAL SONY CAMERA
+        // BUILD PROCEDURAL SONY CAMERA (A7 STYLE)
         // ==========================================
         const cameraGroup = new THREE.Group();
         scene.add(cameraGroup);
 
-        // Materials
-        const bodyMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.8, metalness: 0.2 });
-        const barrelMat = new THREE.MeshStandardMaterial({ color: 0x0a0a0a, roughness: 0.4, metalness: 0.7 });
-        const mountMat = new THREE.MeshStandardMaterial({ color: 0xE55A00, roughness: 0.3, metalness: 0.8 }); // Sony Orange
+        const bodyMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.9, metalness: 0.1 });
+        const plasticMat = new THREE.MeshStandardMaterial({ color: 0x0a0a0a, roughness: 0.6, metalness: 0.2 });
+        const mountMat = new THREE.MeshStandardMaterial({ color: 0xE55A00, roughness: 0.2, metalness: 0.6 }); // Sony Orange
         const glassMat = new THREE.MeshPhysicalMaterial({
             color: 0xffffff, metalness: 0.1, roughness: 0.05,
             transmission: 1.0, thickness: 0.5, ior: 1.5,
         });
 
-        // 1. Camera Body (Box)
-        const bodyGeo = new THREE.BoxGeometry(4.5, 3.2, 1.8);
+        // 1. Camera Body (Tělo - ztenčeno a prodlouženo)
+        const bodyGeo = new THREE.BoxGeometry(5.0, 3.2, 1.2);
         const camBody = new THREE.Mesh(bodyGeo, bodyMat);
-        camBody.position.z = -2;
+        camBody.position.z = -1.8;
         cameraGroup.add(camBody);
 
-        // 2. Lens Mount (Orange Ring)
-        const mountGeo = new THREE.CylinderGeometry(1.4, 1.4, 0.2, 64);
+        // 2. Grip (Pravý úchop)
+        const gripGeo = new THREE.BoxGeometry(1.2, 3.2, 1.8);
+        const grip = new THREE.Mesh(gripGeo, bodyMat);
+        grip.position.set(-1.9, 0, -1.5); // Posunuto z pohledu uživatele doleva
+        cameraGroup.add(grip);
+
+        // 3. EVF Bump (Hledáček na horní straně)
+        const evfGeo = new THREE.BoxGeometry(1.8, 0.8, 1.4);
+        const evf = new THREE.Mesh(evfGeo, bodyMat);
+        evf.position.set(0, 1.8, -1.8);
+        cameraGroup.add(evf);
+
+        // 4. Dials (Kolečka na horní hraně)
+        const dialGeo = new THREE.CylinderGeometry(0.4, 0.4, 0.2, 32);
+        const dial1 = new THREE.Mesh(dialGeo, plasticMat);
+        dial1.position.set(1.5, 1.7, -1.8);
+        cameraGroup.add(dial1);
+        const dial2 = new THREE.Mesh(dialGeo, plasticMat);
+        dial2.position.set(2.1, 1.7, -1.8);
+        cameraGroup.add(dial2);
+
+        // 5. Lens Mount (Oranžový kroužek bajonetu)
+        const mountGeo = new THREE.CylinderGeometry(1.4, 1.4, 0.1, 64);
         mountGeo.rotateX(Math.PI / 2);
         const mount = new THREE.Mesh(mountGeo, mountMat);
-        mount.position.z = -1;
+        mount.position.z = -1.15;
         cameraGroup.add(mount);
 
-        // 3. Lens Barrel
-        const barrelGeo = new THREE.CylinderGeometry(1.6, 1.4, 3.5, 64);
+        // 6. Lens Barrel (Objektiv)
+        const barrelGeo = new THREE.CylinderGeometry(1.55, 1.4, 3.5, 64);
         barrelGeo.rotateX(Math.PI / 2);
-        const barrel = new THREE.Mesh(barrelGeo, barrelMat);
-        barrel.position.z = 0.85;
+        const barrel = new THREE.Mesh(barrelGeo, plasticMat);
+        barrel.position.z = 0.6;
         cameraGroup.add(barrel);
 
-        // Focus Rings (Ribbed structure on barrel)
+        // Focus Rings (Kroužky ostření)
         for(let i = 0; i < 2; i++) {
-            const ringGeo = new THREE.CylinderGeometry(1.62, 1.62, 0.6, 64);
+            const ringGeo = new THREE.CylinderGeometry(1.58, 1.58, 0.6, 64);
             ringGeo.rotateX(Math.PI / 2);
-            const ring = new THREE.Mesh(ringGeo, barrelMat);
-            ring.position.z = 0.5 + (i * 1.2);
+            const ring = new THREE.Mesh(ringGeo, plasticMat);
+            ring.position.z = 0.2 + (i * 1.2);
             cameraGroup.add(ring);
         }
 
-        // 4. Front Glass Element
-        const glassGeo = new THREE.SphereGeometry(1.3, 32, 32, 0, Math.PI * 2, 0, Math.PI / 4);
+        // 7. Front Glass Element (Přední čočka)
+        const glassGeo = new THREE.SphereGeometry(1.2, 32, 32, 0, Math.PI * 2, 0, Math.PI / 4);
         const glass = new THREE.Mesh(glassGeo, glassMat);
-        glass.position.z = 2.0;
+        glass.position.z = 1.9;
         glass.rotation.x = Math.PI / 2;
         cameraGroup.add(glass);
 
-        // Initial setup: camera is slightly turned away
-        cameraGroup.rotation.set(0.3, -0.5, 0.1);
+        // Výchozí rotace pro lepší vyniknutí tvaru a gripu
+        cameraGroup.rotation.set(0.3, -0.6, 0.1);
 
         // ==========================================
         // LIGHTING
         // ==========================================
         scene.add(new THREE.AmbientLight(0xffffff, 0.3));
         const spotLight = new THREE.SpotLight(0xffffff, 4);
-        spotLight.position.set(10, 10, 10);
+        spotLight.position.set(10, 15, 10);
         spotLight.angle = Math.PI / 4;
         scene.add(spotLight);
 
@@ -492,7 +509,6 @@
         const clock = new THREE.Clock();
         function animate() {
             requestAnimationFrame(animate);
-            // Jemné plavání v prostoru, když se nescrolluje
             if(!ScrollTrigger.isScrolling()) {
                 cameraGroup.position.y = Math.sin(clock.getElapsedTime() * 0.5) * 0.1;
             }
@@ -501,40 +517,38 @@
         animate();
 
         // ==========================================
-        // GSAP SCROLL ANIMATIONS (Základ opraveného scrollování)
+        // GSAP TIMELINES
         // ==========================================
         gsap.registerPlugin(ScrollTrigger);
 
-        // 1. Fáze: Kamera se otáčí čelně k uživateli a letí VSTŘÍC obrazovce (do objektivu)
-        const tl = gsap.timeline({
+        // TIMELINE 1: Zoom do kamery (Proběhne v první části scrollu)
+        const zoomTl = gsap.timeline({
             scrollTrigger: {
                 trigger: ".hero",
                 start: "top top",
-                end: "bottom top",
-                scrub: 1, // Plynulý scrub vázaný na native scroll
+                end: "60% top", // Animace kamery skončí za 60% délky hero sekce
+                scrub: 1,
             }
         });
 
-        // Srovnání rotace
-        tl.to(cameraGroup.rotation, {
-            x: 0, y: 0, z: 0,
-            ease: "power2.inOut"
-        }, 0);
-
-        // Průlet DO objektivu (Z pozice se posune až k web kameře)
-        tl.to(cameraGroup.position, {
-            z: 14.5, // Kamera je na Z=15, objekt letí těsně k ní
-            ease: "power3.in"
-        }, 0);
-
+        // Rotace a vletění do čočky
+        zoomTl.to(cameraGroup.rotation, { x: 0, y: 0, z: 0, ease: "power2.inOut" }, 0);
+        zoomTl.to(cameraGroup.position, { z: 14.5, ease: "power3.in" }, 0);
         // Zmizení úvodního textu
-        tl.to(".hero-ui", {
-            opacity: 0,
-            scale: 0.9,
-            ease: "power1.inOut"
-        }, 0);
+        zoomTl.to(".hero-ui", { opacity: 0, scale: 0.9, ease: "power1.inOut" }, 0);
 
-        // 2. Fáze: Fade-in portfolia prvků
+        // TIMELINE 2: Odhalení obsahu (Započne až na konci zoomu)
+        gsap.to("#main-content", {
+            scrollTrigger: {
+                trigger: ".hero",
+                start: "65% top", // Obsah se zviditelní až když je čočka blízko
+                end: "80% top",
+                scrub: 1,
+            },
+            opacity: 1 // Fade-in pro plynulý přechod ze tmy uvnitř objektivu
+        });
+
+        // TIMELINE 3: Fade-in fotek
         gsap.utils.toArray('.img-wrapper').forEach(wrapper => {
             gsap.from(wrapper, {
                 scrollTrigger: {
