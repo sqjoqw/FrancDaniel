@@ -76,7 +76,7 @@
 
         /* === HERO SECTION === */
         .hero {
-            height: 350vh; /* Delší scroll pro dokončení animace PŘED obsahem */
+            height: 350vh;
             position: relative;
             z-index: 2;
         }
@@ -115,7 +115,7 @@
             position: relative;
             z-index: 20;
             padding-top: 5vh;
-            opacity: 0; /* Bude odhaleno přes GSAP až po zoomu */
+            opacity: 0;
             box-shadow: 0 -20px 50px rgba(0,0,0,0.9); 
         }
 
@@ -130,12 +130,13 @@
         }
         .img-wrapper img {
             width: 100%; height: 100%; object-fit: cover;
-            transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), filter 0.8s ease;
+            /* Extra smooth hover transition */
+            transition: transform 1.2s cubic-bezier(0.19, 1, 0.22, 1), filter 1.2s ease;
             filter: grayscale(15%);
             display: block;
         }
         .img-wrapper:hover img {
-            transform: scale(1.03);
+            transform: scale(1.04);
             filter: grayscale(0%);
         }
         .img-overlay {
@@ -144,13 +145,12 @@
             padding: 20px;
             background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
             opacity: 0;
-            transition: opacity 0.4s ease;
+            transition: opacity 0.6s ease;
             font-family: var(--font-mono);
             font-size: 0.8rem;
         }
         .img-wrapper:hover .img-overlay { opacity: 1; }
 
-        /* Mřížka pro 4 portréty (2x2) */
         .grid-portraits { grid-template-columns: repeat(2, 1fr); max-width: 1000px; margin: 0 auto; }
         .grid-portraits .img-wrapper { aspect-ratio: 4/5; }
         
@@ -210,22 +210,9 @@
             justify-content: space-between;
             align-items: flex-start;
         }
-        .pricing-rate h3 {
-            font-size: 3rem;
-            font-weight: 300;
-            line-height: 1;
-        }
-        .pricing-rate span {
-            font-family: var(--font-mono);
-            font-size: 1rem;
-            color: var(--text-muted);
-        }
-        .pricing-desc {
-            max-width: 500px;
-            font-size: 1.1rem;
-            color: var(--text-muted);
-            line-height: 1.6;
-        }
+        .pricing-rate h3 { font-size: 3rem; font-weight: 300; line-height: 1; }
+        .pricing-rate span { font-family: var(--font-mono); font-size: 1rem; color: var(--text-muted); }
+        .pricing-desc { max-width: 500px; font-size: 1.1rem; color: var(--text-muted); line-height: 1.6; }
         .pricing-desc strong { color: #fff; font-weight: 500; }
 
         /* === FOOTER === */
@@ -293,27 +280,27 @@
                 <div class="gallery-section">
                     <span class="mono-label">DIR: /portfolio/portraits</span>
                     <div class="grid grid-portraits">
-                        <div class="img-wrapper"><img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Portrét 1"><div class="img-overlay">#01_PORTRAIT_RAW</div></div>
-                        <div class="img-wrapper"><img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Portrét 2"><div class="img-overlay">#02_PORTRAIT_RAW</div></div>
-                        <div class="img-wrapper"><img src="https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Portrét 3"><div class="img-overlay">#03_PORTRAIT_RAW</div></div>
-                        <div class="img-wrapper"><img src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Portrét 4"><div class="img-overlay">#04_PORTRAIT_RAW</div></div>
+                        <div class="img-wrapper"><img src="images/portraits/11.jpg" alt="Portrét 1"><div class="img-overlay">#11_PORTRAIT_RAW</div></div>
+                        <div class="img-wrapper"><img src="images/portraits/12.jpg" alt="Portrét 2"><div class="img-overlay">#12_PORTRAIT_RAW</div></div>
+                        <div class="img-wrapper"><img src="images/portraits/13.jpg" alt="Portrét 3"><div class="img-overlay">#13_PORTRAIT_RAW</div></div>
+                        <div class="img-wrapper"><img src="images/portraits/14.jpg" alt="Portrét 4"><div class="img-overlay">#14_PORTRAIT_RAW</div></div>
                     </div>
                 </div>
 
                 <div class="gallery-section">
                     <span class="mono-label">DIR: /portfolio/environment</span>
                     <div class="grid grid-landscape">
-                        <div class="img-wrapper"><img src="https://images.unsplash.com/photo-1498036882173-b41c28af5c6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80" alt="Město 1"><div class="img-overlay">URBAN_COMPOSITION</div></div>
-                        <div class="img-wrapper"><img src="https://images.unsplash.com/photo-1519677100203-a0e668c92439?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80" alt="Krajina 1"><div class="img-overlay">LANDSCAPE_WIDE</div></div>
-                        <div class="img-wrapper"><img src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80" alt="Krajina 2"><div class="img-overlay">LIGHT_STUDY</div></div>
+                        <div class="img-wrapper"><img src="images/environment/21.jpg" alt="Město 1"><div class="img-overlay">ENV_21_COMPOSITION</div></div>
+                        <div class="img-wrapper"><img src="images/environment/22.jpg" alt="Krajina 1"><div class="img-overlay">ENV_22_WIDE</div></div>
+                        <div class="img-wrapper"><img src="images/environment/23.jpg" alt="Krajina 2"><div class="img-overlay">ENV_23_STUDY</div></div>
                     </div>
                 </div>
 
                 <div class="gallery-section">
                     <span class="mono-label">DIR: /portfolio/event_coverage</span>
                     <div class="grid grid-event">
-                        <div class="img-wrapper"><img src="https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80" alt="Event Wide"><div class="img-overlay">CROWD_ATMOSPHERE</div></div>
-                        <div class="img-wrapper"><img src="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80" alt="Event Detail"><div class="img-overlay">DJ_DETAIL_LOWLIGHT</div></div>
+                        <div class="img-wrapper"><img src="images/events/3.jpg" alt="Event Wide"><div class="img-overlay">EVNT_3_ATMOSPHERE</div></div>
+                        <div class="img-wrapper"><img src="images/events/31.jpg" alt="Event Detail"><div class="img-overlay">EVNT_31_DETAIL</div></div>
                     </div>
                 </div>
 
@@ -428,31 +415,31 @@
 
         const bodyMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.9, metalness: 0.1 });
         const plasticMat = new THREE.MeshStandardMaterial({ color: 0x0a0a0a, roughness: 0.6, metalness: 0.2 });
-        const mountMat = new THREE.MeshStandardMaterial({ color: 0xE55A00, roughness: 0.2, metalness: 0.6 }); // Sony Orange
+        const mountMat = new THREE.MeshStandardMaterial({ color: 0xE55A00, roughness: 0.2, metalness: 0.6 }); 
         const glassMat = new THREE.MeshPhysicalMaterial({
             color: 0xffffff, metalness: 0.1, roughness: 0.05,
             transmission: 1.0, thickness: 0.5, ior: 1.5,
         });
 
-        // 1. Camera Body (Tělo - ztenčeno a prodlouženo)
+        // Tělo
         const bodyGeo = new THREE.BoxGeometry(5.0, 3.2, 1.2);
         const camBody = new THREE.Mesh(bodyGeo, bodyMat);
         camBody.position.z = -1.8;
         cameraGroup.add(camBody);
 
-        // 2. Grip (Pravý úchop)
+        // Grip
         const gripGeo = new THREE.BoxGeometry(1.2, 3.2, 1.8);
         const grip = new THREE.Mesh(gripGeo, bodyMat);
-        grip.position.set(-1.9, 0, -1.5); // Posunuto z pohledu uživatele doleva
+        grip.position.set(-1.9, 0, -1.5); 
         cameraGroup.add(grip);
 
-        // 3. EVF Bump (Hledáček na horní straně)
+        // Hledáček
         const evfGeo = new THREE.BoxGeometry(1.8, 0.8, 1.4);
         const evf = new THREE.Mesh(evfGeo, bodyMat);
         evf.position.set(0, 1.8, -1.8);
         cameraGroup.add(evf);
 
-        // 4. Dials (Kolečka na horní hraně)
+        // Kolečka
         const dialGeo = new THREE.CylinderGeometry(0.4, 0.4, 0.2, 32);
         const dial1 = new THREE.Mesh(dialGeo, plasticMat);
         dial1.position.set(1.5, 1.7, -1.8);
@@ -461,21 +448,21 @@
         dial2.position.set(2.1, 1.7, -1.8);
         cameraGroup.add(dial2);
 
-        // 5. Lens Mount (Oranžový kroužek bajonetu)
+        // Bajonet
         const mountGeo = new THREE.CylinderGeometry(1.4, 1.4, 0.1, 64);
         mountGeo.rotateX(Math.PI / 2);
         const mount = new THREE.Mesh(mountGeo, mountMat);
         mount.position.z = -1.15;
         cameraGroup.add(mount);
 
-        // 6. Lens Barrel (Objektiv)
+        // Objektiv
         const barrelGeo = new THREE.CylinderGeometry(1.55, 1.4, 3.5, 64);
         barrelGeo.rotateX(Math.PI / 2);
         const barrel = new THREE.Mesh(barrelGeo, plasticMat);
         barrel.position.z = 0.6;
         cameraGroup.add(barrel);
 
-        // Focus Rings (Kroužky ostření)
+        // Kroužky ostření
         for(let i = 0; i < 2; i++) {
             const ringGeo = new THREE.CylinderGeometry(1.58, 1.58, 0.6, 64);
             ringGeo.rotateX(Math.PI / 2);
@@ -484,28 +471,24 @@
             cameraGroup.add(ring);
         }
 
-        // 7. Front Glass Element (Přední čočka)
+        // Přední čočka
         const glassGeo = new THREE.SphereGeometry(1.2, 32, 32, 0, Math.PI * 2, 0, Math.PI / 4);
         const glass = new THREE.Mesh(glassGeo, glassMat);
         glass.position.z = 1.9;
         glass.rotation.x = Math.PI / 2;
         cameraGroup.add(glass);
 
-        // Výchozí rotace pro lepší vyniknutí tvaru a gripu
+        // Výchozí rotace
         cameraGroup.rotation.set(0.3, -0.6, 0.1);
 
-        // ==========================================
-        // LIGHTING
-        // ==========================================
+        // Osvětlení
         scene.add(new THREE.AmbientLight(0xffffff, 0.3));
         const spotLight = new THREE.SpotLight(0xffffff, 4);
         spotLight.position.set(10, 15, 10);
         spotLight.angle = Math.PI / 4;
         scene.add(spotLight);
 
-        // ==========================================
-        // ANIMATION LOOP
-        // ==========================================
+        // Render Loop
         const clock = new THREE.Clock();
         function animate() {
             requestAnimationFrame(animate);
@@ -517,65 +500,66 @@
         animate();
 
         // ==========================================
-        // GSAP TIMELINES
+        // SMOOTH GSAP SCROLL ANIMATIONS
         // ==========================================
         gsap.registerPlugin(ScrollTrigger);
 
-        // TIMELINE 1: Zoom do kamery (Proběhne v první části scrollu)
+        // 1. Plynulejší zoom kamery (scrub: 1.5 pro setrvačnost, power3.inOut pro hladší nájezd)
         const zoomTl = gsap.timeline({
             scrollTrigger: {
                 trigger: ".hero",
                 start: "top top",
-                end: "60% top", // Animace kamery skončí za 60% délky hero sekce
-                scrub: 1,
+                end: "60% top",
+                scrub: 1.5, // Zvýšeno pro větší hladkost/setrvačnost
             }
         });
 
-        // Rotace a vletění do čočky
-        zoomTl.to(cameraGroup.rotation, { x: 0, y: 0, z: 0, ease: "power2.inOut" }, 0);
-        zoomTl.to(cameraGroup.position, { z: 14.5, ease: "power3.in" }, 0);
-        // Zmizení úvodního textu
-        zoomTl.to(".hero-ui", { opacity: 0, scale: 0.9, ease: "power1.inOut" }, 0);
+        zoomTl.to(cameraGroup.rotation, { x: 0, y: 0, z: 0, ease: "power3.inOut" }, 0);
+        zoomTl.to(cameraGroup.position, { z: 14.5, ease: "power3.in" }, 0); // Tahle zůstává 'in', aby to narazilo do skla
+        zoomTl.to(".hero-ui", { opacity: 0, scale: 0.9, ease: "power2.inOut" }, 0);
 
-        // TIMELINE 2: Odhalení obsahu (Započne až na konci zoomu)
+        // 2. Odhalení obsahu
         gsap.to("#main-content", {
             scrollTrigger: {
                 trigger: ".hero",
-                start: "65% top", // Obsah se zviditelní až když je čočka blízko
+                start: "65% top",
                 end: "80% top",
-                scrub: 1,
+                scrub: 1.5,
             },
-            opacity: 1 // Fade-in pro plynulý přechod ze tmy uvnitř objektivu
+            opacity: 1,
+            ease: "none"
         });
 
-        // TIMELINE 3: Fade-in fotek
-        gsap.utils.toArray('.img-wrapper').forEach(wrapper => {
-            gsap.from(wrapper, {
+        // 3. Kaskádovité (staggered) plynulé objevování fotek
+        const grids = gsap.utils.toArray('.grid');
+        grids.forEach(grid => {
+            const images = grid.querySelectorAll('.img-wrapper');
+            gsap.from(images, {
                 scrollTrigger: {
-                    trigger: wrapper,
+                    trigger: grid,
                     start: "top 85%",
                 },
-                y: 40,
+                y: 60, // Vyšší počáteční pozice
                 opacity: 0,
-                duration: 0.8,
-                ease: "power3.out"
+                duration: 1.2, // Delší trvání fade-inu
+                ease: "power3.out",
+                stagger: 0.15 // Postupné načítání (jeden po druhém)
             });
         });
 
+        // 4. Data panely
         gsap.from(".config-dashboard, .pricing-block", {
             scrollTrigger: {
                 trigger: "#config",
-                start: "top 80%"
+                start: "top 85%"
             },
-            y: 30,
+            y: 40,
             opacity: 0,
-            duration: 1,
-            ease: "power2.out"
+            duration: 1.2,
+            ease: "power3.out"
         });
 
-        // ==========================================
-        // WINDOW RESIZE
-        // ==========================================
+        // Resizing
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
