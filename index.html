@@ -76,7 +76,7 @@
 
         /* === HERO SECTION === */
         .hero {
-            height: 250vh; /* Zkráceno pro rychlejší náběh */
+            height: 250vh;
             position: relative;
             z-index: 2;
         }
@@ -119,18 +119,25 @@
             box-shadow: 0 -20px 50px rgba(0,0,0,0.9); 
         }
 
-        /* === PORTFOLIO MASONRY GRID === */
+        /* === PORTFOLIO GRIDS === */
         .gallery-section { margin-bottom: 15vh; }
         
-        /* Masonry setup pomocí CSS sloupců pro zachování poměru stran fotek */
+        /* Klasický Masonry pro portréty a přírodu (více fotek) */
         .masonry-grid {
             column-count: 2;
             column-gap: 20px;
             max-width: 1200px;
             margin: 0 auto;
         }
-        .masonry-grid.wide-env {
-            column-count: 2; /* Pro krajiny můžeš nechat 2, nebo změnit na 1 pokud jsou hodně široké */
+        
+        /* Striktní Grid pro Eventy (natvrdo 2 sloupce vedle sebe) */
+        .side-by-side-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            align-items: start; /* Zabrání roztahování a zachová poměr stran */
         }
 
         .img-wrapper {
@@ -141,11 +148,15 @@
             display: inline-block;
             width: 100%;
             margin-bottom: 20px;
-            break-inside: avoid; /* Zabrání rozlomení fotky mezi sloupci */
+            break-inside: avoid;
         }
+        
+        /* Reset margin pro side-by-side grid aby nebylo zbytečné místo dole */
+        .side-by-side-grid .img-wrapper { margin-bottom: 0; }
+
         .img-wrapper img {
             width: 100%; 
-            height: auto; /* Důležité: Respektuje původní poměr stran */
+            height: auto; 
             display: block;
             transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), filter 0.8s ease;
             filter: grayscale(10%);
@@ -254,7 +265,7 @@
             .hero-subtitle { font-size: 3vw; }
         }
         @media (max-width: 768px) {
-            .masonry-grid { column-count: 1; }
+            .masonry-grid, .side-by-side-grid { column-count: 1; grid-template-columns: 1fr; }
             .config-dashboard { grid-template-columns: 1fr; }
             .ui-panel { border-left: none; border-top: 1px solid var(--border-color); padding-left: 0; padding-top: 20px; }
         }
@@ -295,7 +306,7 @@
 
                 <div class="gallery-section">
                     <span class="mono-label">DIR: /portfolio/environment</span>
-                    <div class="masonry-grid wide-env">
+                    <div class="masonry-grid">
                         <div class="img-wrapper"><img src="images/environment/21.jpg" alt="Environment 1" loading="lazy"><div class="img-overlay">ENV_21_COMPOSITION</div></div>
                         <div class="img-wrapper"><img src="images/environment/22.jpg" alt="Environment 2" loading="lazy"><div class="img-overlay">ENV_22_WIDE</div></div>
                         <div class="img-wrapper"><img src="images/environment/23.jpg" alt="Environment 3" loading="lazy"><div class="img-overlay">ENV_23_STUDY</div></div>
@@ -304,7 +315,7 @@
 
                 <div class="gallery-section">
                     <span class="mono-label">DIR: /portfolio/event_coverage</span>
-                    <div class="masonry-grid">
+                    <div class="side-by-side-grid">
                         <div class="img-wrapper"><img src="images/events/3.jpg" alt="Event Wide" loading="lazy"><div class="img-overlay">EVNT_3_ATMOSPHERE</div></div>
                         <div class="img-wrapper"><img src="images/events/31.jpg" alt="Event Detail" loading="lazy"><div class="img-overlay">EVNT_31_DETAIL</div></div>
                     </div>
@@ -495,11 +506,10 @@
         animate();
 
         // ==========================================
-        // SVIŽNĚJŠÍ GSAP SCROLL ANIMATIONS
+        // GSAP SCROLL ANIMATIONS
         // ==========================================
         gsap.registerPlugin(ScrollTrigger);
 
-        // Změněn scrub na 0.8 pro mnohem rychlejší odezvu
         const zoomTl = gsap.timeline({
             scrollTrigger: {
                 trigger: ".hero",
@@ -524,8 +534,9 @@
             ease: "none"
         });
 
-        const masonryGrids = gsap.utils.toArray('.masonry-grid');
-        masonryGrids.forEach(grid => {
+        // Upravený selektor aby animoval masonry i side-by-side
+        const allGrids = gsap.utils.toArray('.masonry-grid, .side-by-side-grid');
+        allGrids.forEach(grid => {
             const images = grid.querySelectorAll('.img-wrapper');
             gsap.from(images, {
                 scrollTrigger: {
