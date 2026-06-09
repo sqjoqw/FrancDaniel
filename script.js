@@ -10,11 +10,11 @@ document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => {
                 overlay.classList.remove('is-animating', 'is-leaving');
                 overlay.style.transform = 'translateY(-100%)'; 
-            }, 700);
+            }, 600);
         }, 50);
     }
 
-    const links = document.querySelectorAll('a[href]:not([target="_blank"])');
+    const links = document.querySelectorAll('a[href]:not([target="_blank"]):not([href^="mailto:"]):not([href^="#"])');
 
     links.forEach(link => {
         link.addEventListener('click', function(e) {
@@ -29,14 +29,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 setTimeout(() => {
                     window.location.href = targetUrl;
-                }, 700);
+                }, 500);
             }
         });
     });
 
     const observerOptions = {
         root: null,
-        rootMargin: '0px 0px -10% 0px',
+        rootMargin: '0px 0px -10% 0px', 
         threshold: 0.1
     };
 
@@ -50,5 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }, observerOptions);
 
     const elementsToReveal = document.querySelectorAll('.reveal-item, .stagger-item');
-    elementsToReveal.forEach(el => scrollObserver.observe(el));
+    elementsToReveal.forEach(el => {
+        scrollObserver.observe(el);
+    });
 });
